@@ -18,7 +18,8 @@
   "dependencies": {
     "@electron/remote": "^2.0.9",
     "electron-updater": "^4.3.9",
-    "serialport": "^10.4.0"
+    "serialport": "^10.4.0",
+    "tableify":"^1.1.1"
   },
   "build": {
     "appId": "cn.guanmai.x.mes",
