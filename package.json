@@ -11,13 +11,14 @@
   "author": "深圳市观麦网络科技有限公司",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^15.0.0",
-    "electron-builder": "^22.11.7",
+    "electron": "^20.0.1",
+    "electron-builder": "^23.5.1",
     "prettier": "^2.4.1"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.9",
     "electron-updater": "^4.3.9",
-    "serialport": "^9.2.1"
+    "serialport": "^10.4.0"
   },
   "build": {
     "appId": "cn.guanmai.x.mes",
@@ -35,7 +36,8 @@
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "x64",
+            "ia32"
           ]
         }
       ],
