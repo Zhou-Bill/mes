@@ -68,16 +68,16 @@ ncu -u
 
 Q: What to do if the dependencies cannot be downloaded due to network problems
 
-A: ref https://npm.taobao.org/mirrors
+A: ref https://registry.npmmirror.com/mirrors
 
 First execute the following command to add the mirror, and then use `yarn install` to download the dependencies
 
 ```zsh
-yarn config set registry https://registry.npm.taobao.org -g
-yarn config set disturl https://npm.taobao.org/dist -g
-yarn config set electron_mirror https://npm.taobao.org/mirrors/electron/ -g
-yarn config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/ -g
-yarn config set phantomjs_cdnurl https://npm.taobao.org/mirrors/phantomjs/ -g
+yarn config set registry https://registry.npmmirror.com -g
+yarn config set disturl https://registry.npmmirror.com/dist -g
+yarn config set electron_mirror https://registry.npmmirror.com/mirrors/electron/ -g
+yarn config set sass_binary_site https://registry.npmmirror.com/mirrors/node-sass/ -g
+yarn config set phantomjs_cdnurl https://registry.npmmirror.com/mirrors/phantomjs/ -g
 ```
 
 if it still does not work, you can try to use `yarn --ignore-optional` to skip the download of optional dependencies

@@ -8,21 +8,24 @@ const {
 } = require('./dev_config')
 const handleUpdate = require('./src/main/app_update')
 const { appEvent } = require('./src/event')
-const remote = require('@electron/remote/main')
+const path = require('path')
 
 let mainWindow = null
 let printerWindow = null
 
+app.commandLine.appendSwitch('ignore-certificate-errors')
+
 function createWindow() {
   // 创建浏览器窗口
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 1024,
+    width: 800,
+    height: 600,
     center: true,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       enableRemoteModule: true,
-      contextIsolation: false,
+      contextIsolation: false
     },
   })
   mainWindow.focus()
@@ -52,7 +55,6 @@ function createPrinterWindow(url) {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
-      contextIsolation: false,
     },
   })
 
@@ -65,8 +67,6 @@ function createPrinterWindow(url) {
   printerWindow.on('closed', () => {
     printerWindow = null
   })
-
-  remote.enable(printerWindow.webContents)
 }
 
 app.whenReady().then(() => {
@@ -77,9 +77,6 @@ app.whenReady().then(() => {
   createWindow()
   // createPrinterWindow()
   handleUpdate(sendUpdateMessage)
-
-  remote.initialize()
-  remote.enable(mainWindow.webContents)
 })
 
 function sendUpdateMessage(msgObj) {
