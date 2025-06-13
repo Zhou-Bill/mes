@@ -70,7 +70,7 @@ function createPrinterWindow(url) {
 }
 
 app.whenReady().then(() => {
-  app.allowRendererProcessReuse = false
+  app.allowRendererProcessReuse = true
 
   Menu.setApplicationMenu(null)
 
