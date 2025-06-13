@@ -8,7 +8,7 @@ const {
 } = require('./dev_config')
 const handleUpdate = require('./src/main/app_update')
 const { appEvent } = require('./src/event')
-const path = require('path')
+// const path = require('path')
 
 let mainWindow = null
 let printerWindow = null
@@ -22,7 +22,7 @@ function createWindow() {
     height: 600,
     center: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      // preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false
