@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, session } = require('electron')
 const {
   mainLoadURL,
   printLoadURL,
@@ -8,13 +8,13 @@ const {
 } = require('./dev_config')
 const handleUpdate = require('./src/main/app_update')
 const { appEvent } = require('./src/event')
-// const path = require('path')
+
+app.commandLine.appendSwitch('disable-web-security')
+app.commandLine.appendSwitch('ignore-certificate-errors')
+app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
 
 let mainWindow = null
 let printerWindow = null
-
-app.commandLine.appendSwitch('ignore-certificate-errors')
-
 function createWindow() {
   // 创建浏览器窗口
   mainWindow = new BrowserWindow({
@@ -22,15 +22,45 @@ function createWindow() {
     height: 600,
     center: true,
     webPreferences: {
-      // preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
+      contextIsolation: false,
       enableRemoteModule: true,
-      contextIsolation: false
     },
   })
+
+  mainWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
+      // 对于所有请求都允许通过，但保持会话状态
+      callback(0);
+  });
   mainWindow.focus()
 
-  mainWindow.loadURL(mainLoadURL)
+  const myMenuTemplate = [
+    {
+      // 设置菜单项文本
+      label: '操作',
+      // 设置子菜单
+      submenu: [
+        {
+          label: '刷新',
+          accelerator: "CmdOrCtrl+R", 
+          click: () => {
+            mainWindow.reload();
+          }
+        },
+        {
+          label: '打开控制台',
+          accelerator: "CmdOrCtrl+E", 
+          click: () => {
+            mainWindow.webContents.openDevTools()
+          }
+        }
+      ]
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
+  console.log(mainLoadURL)
+  mainWindow.loadURL(mainLoadURL).catch(console.error)
 
   if (isOpenDevTools) {
     mainWindow.webContents.openDevTools()
@@ -53,10 +83,18 @@ function createPrinterWindow(url) {
     frame: false,
     show: showPrint,
     webPreferences: {
-      nodeIntegration: true,
+       nodeIntegration: true,
+      contextIsolation: false,
       enableRemoteModule: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false
     },
   })
+
+  printerWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
+    callback(0);
+  });
+
 
   printerWindow.loadURL(url || printLoadURL)
 
@@ -69,10 +107,14 @@ function createPrinterWindow(url) {
   })
 }
 
-app.whenReady().then(() => {
-  app.allowRendererProcessReuse = true
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  event.preventDefault();
+  callback(true); // 允许继续加载
+});
 
-  Menu.setApplicationMenu(null)
+app.whenReady().then(async () => {
+  await session.defaultSession.clearCache()
+  app.allowRendererProcessReuse = false
 
   createWindow()
   // createPrinterWindow()
@@ -97,6 +139,15 @@ app.on('activate', () => {
     createPrinterWindow()
   }
 })
+
+// app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  
+//     // Prevent having error
+//     event.preventDefault()
+//     // and continue
+//     callback(true)
+
+// })
 
 // 接受渲染进程对 print 事件
 ipcMain.handle('print', (event, payload) => {
