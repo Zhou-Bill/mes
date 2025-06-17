@@ -6,9 +6,9 @@ const {
   showPrint,
   isOpenPrintDevTools,
 } = require('./dev_config')
-const log = require('electron-log');
-const path = require('path');
-const fs = require('fs');
+// const log = require('electron-log');
+// const path = require('path');
+// const fs = require('fs');
 
 const handleUpdate = require('./src/main/app_update')
 const { appEvent } = require('./src/event')
@@ -18,11 +18,30 @@ app.commandLine.appendSwitch('ignore-certificate-errors')
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
 
 // 自定义桌面上的日志文件夹
-log.transports.file.resolvePathFn = () => {
-  const logDir = path.join(app.getPath('desktop'), 'electron-logs');
-  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
-  return path.join(logDir, `main-${new Date().toISOString().replace(/:/g, '-')}.log`);
-};
+// log.transports.file.resolvePathFn = () => {
+//   const logDir = path.join(app.getPath('desktop'), 'electron-logs');
+//   if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
+//   return path.join(logDir, `main-${new Date().toISOString().replace(/:/g, '-')}.log`);
+// };
+
+function handleConnectionClosed(url) {
+  // 1. 重试逻辑（最多3次）
+  const maxRetries = 3;
+  let retryCount = 0;
+  
+  const retryLoad = () => {
+    if (retryCount < maxRetries) {
+      retryCount++;
+      console.log(`尝试重新加载 (${retryCount}/${maxRetries})...`);
+      mainWindow.loadURL(url).catch(() => {
+        setTimeout(retryLoad, 2000); // 2秒后重试
+      });
+    } 
+  };
+  
+  retryLoad();
+}
+
 
 let mainWindow = null
 let printerWindow = null
@@ -71,10 +90,17 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
   console.log(mainLoadURL)
-  log.info('mainLoadURL', mainLoadURL);
-  mainWindow.loadURL(mainLoadURL).catch((err) => {
-    log.error('loadURL error', err);
-  })
+  // log.info('mainLoadURL', mainLoadURL);
+  mainWindow.loadURL(mainLoadURL)
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    if (errorCode === -100) { // -100 是 ERR_CONNECTION_CLOSED 的错误代码
+      console.error(`连接被关闭: ${validatedURL}`);
+      console.log(`错误描述: ${errorDescription}`);
+      handleConnectionClosed(mainLoadURL);
+    }
+  });
+
   if (isOpenDevTools) {
     mainWindow.webContents.openDevTools()
   }
@@ -153,14 +179,6 @@ app.on('activate', () => {
   }
 })
 
-// app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-  
-//     // Prevent having error
-//     event.preventDefault()
-//     // and continue
-//     callback(true)
-
-// })
 
 // 接受渲染进程对 print 事件
 ipcMain.handle('print', (event, payload) => {
