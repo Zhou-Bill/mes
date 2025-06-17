@@ -6,12 +6,23 @@ const {
   showPrint,
   isOpenPrintDevTools,
 } = require('./dev_config')
+const log = require('electron-log');
+const path = require('path');
+const fs = require('fs');
+
 const handleUpdate = require('./src/main/app_update')
 const { appEvent } = require('./src/event')
 
 app.commandLine.appendSwitch('disable-web-security')
 app.commandLine.appendSwitch('ignore-certificate-errors')
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true')
+
+// 自定义桌面上的日志文件夹
+log.transports.file.resolvePathFn = () => {
+  const logDir = path.join(app.getPath('desktop'), 'electron-logs');
+  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
+  return path.join(logDir, `main-${new Date().toISOString().replace(/:/g, '-')}.log`);
+};
 
 let mainWindow = null
 let printerWindow = null
@@ -60,8 +71,10 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
   console.log(mainLoadURL)
-  mainWindow.loadURL(mainLoadURL).catch(console.error)
-
+  log.info('mainLoadURL', mainLoadURL);
+  mainWindow.loadURL(mainLoadURL).catch((err) => {
+    log.error('loadURL error', err);
+  })
   if (isOpenDevTools) {
     mainWindow.webContents.openDevTools()
   }

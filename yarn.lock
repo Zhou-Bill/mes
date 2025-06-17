@@ -853,6 +853,11 @@ electron-builder@^22.11.7:
     update-notifier "^5.1.0"
     yargs "^17.0.1"
 
+electron-log@^5.4.1:
+  version "5.4.1"
+  resolved "https://registry.npmjs.org/electron-log/-/electron-log-5.4.1.tgz#700ddc6ef4b06c13a983468580ba7a7e579129d4"
+  integrity sha512-QvisA18Z++8E3Th0zmhUelys9dEv7aIeXJlbFw3UrxCc8H9qSRW0j8/ooTef/EtHui8tVmbKSL+EIQzP9GoRLg==
+
 electron-publish@22.11.7:
   version "22.11.7"
   resolved "https://registry.npmmirror.com/electron-publish/download/electron-publish-22.11.7.tgz?cache=0&sync_timestamp=1631123290300&other_urls=https%3A%2F%2Fregistry.nlark.com%2Felectron-publish%2Fdownload%2Felectron-publish-22.11.7.tgz#4126cbb08ccf082a2aa7fef89ee629b3a4b8ae9a"

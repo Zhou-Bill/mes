@@ -16,6 +16,7 @@
     "prettier": "^2.4.1"
   },
   "dependencies": {
+    "electron-log": "^5.4.1",
     "electron-updater": "^4.3.9",
     "serialport": "9.2.1"
   },
