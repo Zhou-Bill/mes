@@ -1,5 +1,5 @@
 {
-  "name": "gm-electron-mes",
+  "name": "sanxia-mes",
   "version": "1.0.2",
   "description": "智能工位屏软件",
   "main": "main.js",
@@ -21,8 +21,8 @@
     "serialport": "9.2.1"
   },
   "build": {
-    "appId": "cn.guanmai.x.mes",
-    "productName": "智能工位屏",
+    "appId": "sanxia.guanmai.x.mes",
+    "productName": "三峡智能工位屏",
     "copyright": "Copyright © 2020 gm",
     "directories": {
       "output": "dist"
