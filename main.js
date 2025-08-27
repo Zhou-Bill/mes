@@ -89,7 +89,6 @@ function createWindow() {
   ];
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
-  console.log(mainLoadURL)
   // log.info('mainLoadURL', mainLoadURL);
   mainWindow.loadURL(mainLoadURL)
 
@@ -156,7 +155,7 @@ app.whenReady().then(async () => {
   app.allowRendererProcessReuse = false
 
   createWindow()
-  // createPrinterWindow()
+  createPrinterWindow()
   handleUpdate(sendUpdateMessage)
 })
 
