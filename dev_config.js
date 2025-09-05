@@ -9,7 +9,7 @@ const config = {
 }
 
 try {
-  const mes = require(app.getPath('desktop') + '/mes.json')
+  const mes = require(app.getPath('desktop') + '/sanxia_mes.json')
   Object.assign(config, mes)
 } catch (err) {
   console.log(err)
