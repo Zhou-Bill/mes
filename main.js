@@ -90,6 +90,7 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
   // log.info('mainLoadURL', mainLoadURL);
+  console.log(mainLoadURL)
   mainWindow.loadURL(mainLoadURL)
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
