@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, session } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, session, globalShortcut } = require('electron')
 const {
   mainLoadURL,
   printLoadURL,
@@ -42,6 +42,46 @@ function handleConnectionClosed(url) {
   retryLoad();
 }
 
+const createMenu = () => {
+  const myMenuTemplate = [
+    {
+      // 设置菜单项文本
+      label: '操作',
+      // 设置子菜单
+      submenu: [
+        {
+          label: '刷新',
+          // accelerator: "CmdOrCtrl+R", 
+          click: () => {
+            mainWindow.reload();
+          }
+        },
+        {
+          label: '打开控制台',
+          // accelerator: "CmdOrCtrl+E", 
+          click: () => {
+            mainWindow.webContents.openDevTools()
+          }
+        }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' }
+      ]
+    }
+  ];
+  const menus = Menu.buildFromTemplate(myMenuTemplate)
+  Menu.setApplicationMenu(menus)
+}
+
 
 let mainWindow = null
 let printerWindow = null
@@ -55,6 +95,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      allowRunningInsecureContent: true,
     },
   })
 
@@ -64,33 +105,9 @@ function createWindow() {
   });
   mainWindow.focus()
 
-  const myMenuTemplate = [
-    {
-      // 设置菜单项文本
-      label: '操作',
-      // 设置子菜单
-      submenu: [
-        {
-          label: '刷新',
-          accelerator: "CmdOrCtrl+R", 
-          click: () => {
-            mainWindow.reload();
-          }
-        },
-        {
-          label: '打开控制台',
-          accelerator: "CmdOrCtrl+E", 
-          click: () => {
-            mainWindow.webContents.openDevTools()
-          }
-        }
-      ]
-    },
-  ];
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(myMenuTemplate))
-  // log.info('mainLoadURL', mainLoadURL);
   console.log(mainLoadURL)
+  // log.info('mainLoadURL', mainLoadURL);
   mainWindow.loadURL(mainLoadURL)
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
@@ -122,18 +139,18 @@ function createPrinterWindow(url) {
     frame: false,
     show: showPrint,
     webPreferences: {
-       nodeIntegration: true,
+      nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
       webSecurity: true,
-      allowRunningInsecureContent: false
+      allowRunningInsecureContent: true
     },
   })
 
   printerWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
     callback(0);
   });
-
+  console.log("print", url)
 
   printerWindow.loadURL(url || printLoadURL)
 
@@ -154,7 +171,7 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
 app.whenReady().then(async () => {
   await session.defaultSession.clearCache()
   app.allowRendererProcessReuse = false
-
+  createMenu()
   createWindow()
   createPrinterWindow()
   handleUpdate(sendUpdateMessage)
@@ -179,6 +196,14 @@ app.on('activate', () => {
   }
 })
 
+// app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  
+//     // Prevent having error
+//     event.preventDefault()
+//     // and continue
+//     callback(true)
+
+// })
 
 // 接受渲染进程对 print 事件
 ipcMain.handle('print', (event, payload) => {

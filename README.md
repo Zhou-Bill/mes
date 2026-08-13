@@ -5,6 +5,11 @@
 - **mac os only:** Command Line Tools (CLT) for Xcode: xcode-select --install, [developer.apple.com/downloads](http://developer.apple.com/downloads) or [Xcode 3](https://apps.apple.com/us/app/xcode/id497799835)
 - **arch linux os only:** [base-devel](https://archlinux.org/groups/x86_64/base-devel/) have been installed
 
+
+## 请看这里
+
+`package.json` 的 ` "serialport": "9.2.1"` 需要改成     `"serialport": "^10.2.1"` 不然跑不起来
+
 ## Getting started
 
 Clone the repository
